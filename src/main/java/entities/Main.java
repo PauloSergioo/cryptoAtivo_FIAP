@@ -1,9 +1,7 @@
 package entities;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Scanner;
+import java.io.*;
+import java.util.*;
 
 public class Main {
 
@@ -13,21 +11,29 @@ public class Main {
         List<Usuario> usuarios = new ArrayList<>();
         List<Carteira> carteiras = new ArrayList<>();
         List<CryptoAtivo> criptoativos = new ArrayList<>();
+        Map<String, CryptoAtivo> criptoMap = new HashMap<>();
+        Map<String, Usuario> usuarioMap = new HashMap<>();
 
         Usuario investidor = new Investidor("1", "João", "joao@example.com", "exemplo123", "investidor", "junior");
         Usuario administrador = new Administrador("2", "Maria", "maria@example.com", "exemplo123", "administrador", "senior");
         usuarios.add(investidor);
         usuarios.add(administrador);
 
+        usuarioMap.put(investidor.getIdUsuario(), investidor);
+        usuarioMap.put(administrador.getIdUsuario(), administrador);
+
         Carteira carteiraInvestidor = new Carteira("1", 500.0, investidor);
         Carteira carteiraAdmin = new Carteira("2", 1000.0, administrador);
         carteiras.add(carteiraInvestidor);
         carteiras.add(carteiraAdmin);
 
-        CryptoAtivo bitcoin = new CryptoAtivo("1", "Bitcoin", 30000.0, 0.01, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+        CryptoAtivo bitcoin = new CryptoAtivo("1", "Bitcoin", 3000.0, 0.01, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
         CryptoAtivo ethereum = new CryptoAtivo("2", "Ethereum", 2000.0, 0.5, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
         criptoativos.add(bitcoin);
         criptoativos.add(ethereum);
+
+        criptoMap.put(bitcoin.getIdCripto(), bitcoin);
+        criptoMap.put(ethereum.getIdCripto(), ethereum);
 
         System.out.println("Usuários cadastrados:");
         for (int i = 0; i < usuarios.size(); i++) {
@@ -41,11 +47,6 @@ public class Main {
             if (indiceUsuario >= 0 && indiceUsuario < usuarios.size()) {
                 usuario = usuarios.get(indiceUsuario);
                 System.out.println("Usuário selecionado: " + usuario.getNome());
-                System.out.println("Saldo disponível: R$ " + carteiraInvestidor.getSaldo());
-                System.out.println("Criptoativos disponíveis:");
-                for (CryptoAtivo cripto : criptoativos) {
-                    System.out.println(cripto.getNome() + ": " + cripto.getQuantidade() + " disponíveis.");
-                }
             } else {
                 System.out.println("Usuário inválido. Tente novamente.");
             }
@@ -74,7 +75,9 @@ public class Main {
             System.out.println("4 - Vender criptoativo");
             System.out.println("5 - Exibir transações");
             System.out.println("6 - Exibir alertas");
-            System.out.println("7 - Sair");
+            System.out.println("7 - Exportar dados para arquivo");
+            System.out.println("8 - Carregar dados do arquivo");
+            System.out.println("9 - Sair");
             opcao = scanner.nextInt();
 
             switch (opcao) {
@@ -108,29 +111,27 @@ public class Main {
 
                 case 3:
                     System.out.println("Escolha o criptoativo para compra:");
-                    for (int i = 0; i < criptoativos.size(); i++) {
-                        System.out.println((i + 1) + " - " + criptoativos.get(i).getNome() + " (Preço: R$ " + criptoativos.get(i).getValorAtual() + ")");
+                    for (CryptoAtivo cripto : criptoativos) {
+                        System.out.println(cripto.getNome() + " - Preço: R$ " + cripto.getValorAtual());
                     }
-                    int escolhaCriptoCompra = scanner.nextInt() - 1;
-                    if (escolhaCriptoCompra >= 0 && escolhaCriptoCompra < criptoativos.size()) {
-                        CryptoAtivo criptoCompra = criptoativos.get(escolhaCriptoCompra);
+                    System.out.print("Digite o ID do criptoativo: ");
+                    String idCompra = scanner.next();
+                    CryptoAtivo criptoCompra = criptoMap.get(idCompra);
+                    if (criptoCompra != null) {
                         System.out.print("Digite a quantidade a comprar: ");
                         double quantidadeCompra = scanner.nextDouble();
                         double valorTotalCompra = quantidadeCompra * criptoCompra.getValorAtual();
                         if (valorTotalCompra > carteira.getSaldo()) {
-                            System.out.println("Saldo insuficiente para compra. Saldo atual: R$ " + carteira.getSaldo());
+                            System.out.println("Saldo insuficiente.");
                         } else {
                             carteira.retirar(valorTotalCompra);
                             criptoCompra.adicionarQuantidade(quantidadeCompra);
-                            Transacao compra = new Compra("C1", "Compra", quantidadeCompra, new Date(), usuario, criptoCompra, 5.0, carteira, valorTotalCompra);
-                            carteira.adicionarTransacao(compra);
-                            System.out.println("Compra realizada: " + quantidadeCompra + " " + criptoCompra.getNome());
+                            System.out.println("Compra realizada!");
                         }
                     } else {
-                        System.out.println("Criptoativo inválido.");
+                        System.out.println("ID inválido.");
                     }
                     break;
-
                 case 4:
                     System.out.println("Escolha o criptoativo para venda:");
                     boolean criptoDisponivelVenda = false;
@@ -168,7 +169,7 @@ public class Main {
                         }
                     }
                     break;
-                    
+
                 case 5:
                     if (carteira.getTransacoes().isEmpty()) {
                         System.out.println("Nenhuma transação registrada.");
@@ -189,13 +190,40 @@ public class Main {
                     break;
 
                 case 7:
+                    try (BufferedWriter writer = new BufferedWriter(new FileWriter("dados.txt"))) {
+                        writer.write("Usuários:\n");
+                        for (Usuario u : usuarios) {
+                            writer.write(u.toString() + "\n");
+                        }
+                        writer.write("\nCriptoativos:\n");
+                        for (CryptoAtivo c : criptoativos) {
+                            writer.write(c.toString() + "\n");
+                        }
+                        System.out.println("Dados exportados para 'dados.txt'.");
+                    } catch (IOException e) {
+                        System.out.println("Erro ao salvar o arquivo: " + e.getMessage());
+                    }
+                    break;
+
+                case 8:
+                    try (BufferedReader reader = new BufferedReader(new FileReader("dados.txt"))) {
+                        String linha;
+                        while ((linha = reader.readLine()) != null) {
+                            System.out.println(linha);
+                        }
+                    } catch (IOException e) {
+                        System.out.println("Erro ao carregar o arquivo: " + e.getMessage());
+                    }
+                    break;
+
+                case 9:
                     System.out.println("Saindo...");
                     break;
 
                 default:
                     System.out.println("Opção inválida.");
             }
-        } while (opcao != 7);
+        } while (opcao != 9);
 
         scanner.close();
     }

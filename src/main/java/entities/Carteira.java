@@ -51,4 +51,10 @@ public class Carteira {
     public void adicionarTransacao(Transacao transacao) {
         transacoes.add(transacao);
     }
+
+    @Override
+    public String toString() {
+        return "ID: " + idCarteira + ", Saldo: " + saldo + ", Usuário: " + usuario.getNome();
+    }
+
 }

@@ -90,4 +90,10 @@ public class Usuario {
             educacaoFinanceira.add(material);
         }
     }
+
+    @Override
+    public String toString() {
+        return "ID: " + idUsuario + ", Nome: " + nome + ", Email: " + email;
+    }
+
 }

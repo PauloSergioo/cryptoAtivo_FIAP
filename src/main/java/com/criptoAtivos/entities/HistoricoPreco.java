@@ -1,4 +1,4 @@
-package entities;
+package com.criptoAtivos.entities;
 
 import java.util.Date;
 

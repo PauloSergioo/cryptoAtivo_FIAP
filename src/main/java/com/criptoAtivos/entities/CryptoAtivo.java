@@ -1,7 +1,5 @@
-package entities;
+package com.criptoAtivos.entities;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class CryptoAtivo {
@@ -86,4 +84,10 @@ public class CryptoAtivo {
     public void adicionarEducacao(Educacao material) {
         educacao.add(material);
     }
+
+    @Override
+    public String toString() {
+        return "ID: " + idCripto + ", Nome: " + nome + ", Valor Atual: " + valorAtual + ", Quantidade Disponível: " + quantidade;
+    }
+
 }

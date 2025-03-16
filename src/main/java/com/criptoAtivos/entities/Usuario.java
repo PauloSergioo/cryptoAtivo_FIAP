@@ -1,4 +1,4 @@
-package entities;
+package com.criptoAtivos.entities;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -6,6 +6,7 @@ import java.util.List;
 
 public class Usuario {
     private final String idUsuario;
+    private String cpf;
     private String nome;
     private String email;
     private String senha;
@@ -14,8 +15,9 @@ public class Usuario {
     private final List<Educacao> educacaoFinanceira;
     private final List<Alerta> alertas;
 
-    public Usuario(String idUsuario, String nome, String email, String senha, String perfil) {
+    public Usuario(String idUsuario, String cpf, String nome, String email, String senha, String perfil) {
         this.idUsuario = idUsuario;
+        this.cpf = cpf;
         this.nome = nome;
         this.email = email;
         this.senha = senha;
@@ -90,4 +92,37 @@ public class Usuario {
             educacaoFinanceira.add(material);
         }
     }
+
+    public String getCpf() {
+        return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
+    }
+
+    @Override
+    public String toString() {
+
+        int tamanhoTabela = 40;
+        String linha = "+" + "-".repeat(tamanhoTabela - 2) + "+";
+
+        String dados = String.format(
+                "| %-10s: %-25s |\n" + // CPF
+                        "| %-10s: %-25s |\n" +
+                        "| %-10s: %-25s |\n" +
+                        "| %-10s: %-25s |",
+                "Nome", nome,
+                "Email", email,
+                "Perfil", perfil,
+                "CPF", cpf
+        );
+
+        return linha + "\n" +
+                "| Dados do Usuário" + " ".repeat(tamanhoTabela - 19) + "|\n" +
+                linha + "\n" +
+                dados + "\n" +
+                linha;
+    }
+
 }

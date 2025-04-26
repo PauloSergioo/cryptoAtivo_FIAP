@@ -133,12 +133,6 @@ public class Plataforma {
         adicionarTransacao(transacao);
     }
 
-    public void enviarAlerta(Alerta alerta) {
-        if (alerta == null) throw new IllegalArgumentException("Alerta inválido.");
-        alerta.getUsuario().receberAlerta(alerta);
-        adicionarAlerta(alerta);
-    }
-
     public Usuario buscarUsuarioPorId(String idUsuario) {
         return usuarios.stream().filter(u -> u.getIdUsuario().equals(idUsuario)).findFirst().orElse(null);
     }

@@ -11,9 +11,27 @@ public class Usuario {
     private String email;
     private String senha;
     private String perfil;
-    private final List<Carteira> carteiras;
-    private final List<Educacao> educacaoFinanceira;
-    private final List<Alerta> alertas;
+    private Carteira carteira;
+
+
+    public Usuario(String idUsuario, String cpf, String nome, String email, String senha, String perfil, Carteira carteira) {
+        this.idUsuario = idUsuario;
+        this.cpf = cpf;
+        this.nome = nome;
+        this.email = email;
+        this.senha = senha;
+        this.perfil = perfil;
+        this.carteira = carteira;
+    }
+
+    public Usuario(String idUsuario, Carteira carteira) {
+        this.idUsuario = idUsuario;
+        this.carteira = carteira;
+    }
+
+    public Usuario(String idUsuario) {
+        this.idUsuario = idUsuario;
+    }
 
     public Usuario(String idUsuario, String cpf, String nome, String email, String senha, String perfil) {
         this.idUsuario = idUsuario;
@@ -22,9 +40,6 @@ public class Usuario {
         this.email = email;
         this.senha = senha;
         this.perfil = perfil;
-        this.carteiras = new ArrayList<>();
-        this.alertas = new ArrayList<>();
-        this.educacaoFinanceira = new ArrayList<>();
     }
 
     public String getIdUsuario() {
@@ -63,34 +78,8 @@ public class Usuario {
         this.perfil = perfil;
     }
 
-    public List<Carteira> getCarteiras() {
-        return Collections.unmodifiableList(carteiras);
-    }
-
-    public void adicionarCarteira(Carteira carteira) {
-        if (carteira != null && !carteiras.contains(carteira)) {
-            carteiras.add(carteira);
-        }
-    }
-
-    public List<Alerta> getAlertas() {
-        return Collections.unmodifiableList(alertas);
-    }
-
-    public void receberAlerta(Alerta alerta) {
-        if (alerta != null) {
-            alertas.add(alerta);
-        }
-    }
-
-    public List<Educacao> getEducacaoFinanceira() {
-        return Collections.unmodifiableList(educacaoFinanceira);
-    }
-
-    public void adicionarEducacao(Educacao material) {
-        if (material != null && !educacaoFinanceira.contains(material)) {
-            educacaoFinanceira.add(material);
-        }
+    public Carteira getCarteira() {
+        return carteira;
     }
 
     public String getCpf() {
@@ -108,7 +97,7 @@ public class Usuario {
         String linha = "+" + "-".repeat(tamanhoTabela - 2) + "+";
 
         String dados = String.format(
-                "| %-10s: %-25s |\n" + // CPF
+                "| %-10s: %-25s |\n" +
                         "| %-10s: %-25s |\n" +
                         "| %-10s: %-25s |\n" +
                         "| %-10s: %-25s |",

@@ -4,16 +4,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Transacao {
-    private final String idTransacao;
-    private final String tipo;
-    private final double quantidade;
-    private final Date data;
-    private final Usuario usuario;
-    private final CryptoAtivo criptoativo;
-    private final double taxa;
-    private final Carteira carteira;
+    private String idTransacao;
+    private String tipo;
+    private Double quantidade;
+    private Date data;
+    private Usuario usuario;
+    private CryptoAtivo criptoativo;
+    private Double taxa;
+    private Carteira carteira;
 
-    public Transacao(String idTransacao, String tipo, double quantidade, Date data, Usuario usuario, CryptoAtivo criptoativo, double taxa, Carteira carteira) {
+    public Transacao(String idTransacao, String tipo, Double quantidade, Date data, Usuario usuario, CryptoAtivo criptoativo, Double taxa, Carteira carteira) {
         this.idTransacao = idTransacao;
         this.tipo = tipo;
         this.quantidade = quantidade;
@@ -24,6 +24,10 @@ public class Transacao {
         this.carteira = carteira;
     }
 
+    public Transacao(String idTransacao) {
+        this.idTransacao = idTransacao;
+    }
+
     public String getIdTransacao() {
         return idTransacao;
     }
@@ -32,7 +36,7 @@ public class Transacao {
         return tipo;
     }
 
-    public double getQuantidade() {
+    public Double getQuantidade() {
         return quantidade;
     }
 
@@ -48,7 +52,7 @@ public class Transacao {
         return criptoativo;
     }
 
-    public double getTaxa() {
+    public Double getTaxa() {
         return taxa;
     }
 
@@ -58,8 +62,8 @@ public class Transacao {
 
     public String exibirTransacao() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-        double valorTotal = quantidade * criptoativo.getValorAtual();
-        double valorComTaxa = valorTotal + taxa;
+        Double valorTotal = quantidade * criptoativo.getValorAtual();
+        Double valorComTaxa = valorTotal + taxa;
 
         return String.format(
                 "ID: %s | Tipo: %s | Criptoativo: %s | Quantidade: %.4f | Valor Total: R$ %.2f | Taxa: R$ %.2f | Valor com Taxa: R$ %.2f | Data: %s",

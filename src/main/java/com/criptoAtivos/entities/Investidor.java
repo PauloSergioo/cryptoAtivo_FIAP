@@ -11,19 +11,4 @@ public class Investidor extends Usuario {
         this.nivelInvestidor = nivelInvestidor;
     }
 
-    public double consultarSaldo() {
-        double saldoTotal = 0;
-        for (Carteira carteira : getCarteiras()) {
-            saldoTotal += carteira.getSaldo();
-        }
-        return saldoTotal;
-    }
-
-    public List<Transacao> verHistoricoTransacoes() {
-        List<Transacao> historico = new ArrayList<>();
-        for (Carteira carteira : getCarteiras()) {
-            historico.addAll(carteira.getTransacoes());
-        }
-        return historico;
-    }
 }

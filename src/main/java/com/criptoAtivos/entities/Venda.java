@@ -10,6 +10,15 @@ public class Venda extends Transacao {
         this.valorVenda = valorVenda;
     }
 
+    public Venda(String idTransacao, double valorVenda) {
+        super(idTransacao);
+        this.valorVenda = valorVenda;
+    }
+
+    public double getValorVenda() {
+        return valorVenda;
+    }
+
     public double calcularLucro() {
         return valorVenda - (getQuantidade() * getCriptoativo().getValorAtual());
     }

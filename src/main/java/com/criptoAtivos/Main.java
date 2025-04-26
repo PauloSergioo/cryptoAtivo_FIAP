@@ -1,6 +1,6 @@
 package com.criptoAtivos;
 
-import com.criptoAtivos.dao.UsuarioDAO;
+import com.criptoAtivos.dao.*;
 import com.criptoAtivos.entities.*;
 import com.criptoAtivos.factory.ConnectionFactory;
 
@@ -12,6 +12,11 @@ import java.util.*;
 public class Main {
     public static void main(String[] args) {
         UsuarioDAO usuarioDAO = new UsuarioDAO();
+        CarteiraDAO carteiraDAO = new CarteiraDAO();
+        CryptoAtivoDAO criptoAtivoDAO = new CryptoAtivoDAO();
+        TransacaoDAO transacaoDAO = new TransacaoDAO();
+        CompraDAO compraDAO = new CompraDAO();
+        VendaDAO vendaDAO = new VendaDAO();
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
@@ -21,7 +26,8 @@ public class Main {
             System.out.println("3. Buscar Usuário por CPF");
             System.out.println("4. Atualizar Usuário");
             System.out.println("5. Deletar Usuário");
-            System.out.println("6. Sair");
+            System.out.println("6. Realizar Transação (Compra/Venda)");
+            System.out.println("7. Sair");
             System.out.print("Escolha uma opção: ");
             int opcao = scanner.nextInt();
             scanner.nextLine();
@@ -43,6 +49,9 @@ public class Main {
                     deletarUsuario(usuarioDAO, scanner);
                     break;
                 case 6:
+                    realizarTransacao(usuarioDAO, criptoAtivoDAO, carteiraDAO, transacaoDAO, compraDAO, vendaDAO, scanner);
+                    break;
+                case 7:
                     System.out.println("Saindo...");
                     scanner.close();
                     return;
@@ -229,4 +238,94 @@ public class Main {
             }
         }
     }
+
+    private static void realizarTransacao(UsuarioDAO usuarioDAO, CryptoAtivoDAO criptoAtivoDAO, CarteiraDAO carteiraDAO, TransacaoDAO transacaoDAO, CompraDAO compraDAO, VendaDAO vendaDAO, Scanner scanner) {
+        System.out.println("\n=== Realizar Transação ===");
+
+        System.out.print("Digite o CPF do usuário: ");
+        String cpf = scanner.nextLine();
+        cpf = cpf.replaceAll("[^0-9]", "");
+
+        if (cpf.length() != 11) {
+            System.out.println("Erro: O CPF deve ter exatamente 11 dígitos.");
+            return;
+        }
+
+        Usuario usuario = usuarioDAO.getByCpf(cpf);
+        if (usuario == null) {
+            System.out.println("Erro: Usuário não encontrado.");
+            return;
+        }
+
+        System.out.println("Usuário encontrado: " + usuario.getNome());
+
+        int tipoOperacao = 0;
+        while (true) {
+            System.out.println("Digite 1 para COMPRA ou 2 para VENDA:");
+            String entrada = scanner.nextLine();
+            if (entrada.equals("1") || entrada.equals("2")) {
+                tipoOperacao = Integer.parseInt(entrada);
+                break;
+            } else {
+                System.out.println("Opção inválida. Tente novamente.");
+            }
+        }
+
+        System.out.print("Digite o nome do ativo (ex: Bitcoin, Ethereum): ");
+        String ativo = scanner.nextLine();
+
+        System.out.print("Digite a quantidade: ");
+        double quantidade;
+        try {
+            quantidade = Double.parseDouble(scanner.nextLine());
+            if (quantidade <= 0) {
+                System.out.println("Erro: A quantidade deve ser positiva.");
+                return;
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Erro: Quantidade inválida.");
+            return;
+        }
+
+        CryptoAtivo criptoAtivo = criptoAtivoDAO.getByNome(ativo);
+        if (criptoAtivo == null) {
+            System.out.println("Erro: Ativo não encontrado.");
+            return;
+        }
+
+        double taxa = 0.02;
+
+        Carteira carteira = carteiraDAO.getByIdUsuario(usuario.getIdUsuario());
+
+        Transacao transacao = new Transacao(
+                UUID.randomUUID().toString(),
+                tipoOperacao == 1 ? "COMPRA" : "VENDA",
+                quantidade,
+                new Date(),
+                usuario,
+                criptoAtivo,
+                taxa,
+                carteira
+        );
+
+        transacaoDAO.insert(transacao);
+
+        if (tipoOperacao == 1) {
+
+            double valorCompra = criptoAtivo.getValorAtual() * quantidade * (1 + taxa);
+            Compra compra = new Compra(transacao.getIdTransacao(), valorCompra);
+            compraDAO.insert(compra);
+        } else {
+
+            double valorVenda = criptoAtivo.getValorAtual() * quantidade * (1 - taxa);
+            Venda venda = new Venda(transacao.getIdTransacao(), valorVenda);
+            vendaDAO.insert(venda);
+        }
+
+        carteiraDAO.update(carteira);
+
+        System.out.println("Transação concluída com sucesso!");
+    }
+
+
 }

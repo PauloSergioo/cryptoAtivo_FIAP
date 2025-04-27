@@ -259,6 +259,32 @@ public class Main {
 
         System.out.println("Usuário encontrado: " + usuario.getNome());
 
+        System.out.println("\n=== Criptos Disponíveis ===");
+        List<CryptoAtivo> criptoAtivos = criptoAtivoDAO.getAll();
+        if (criptoAtivos.isEmpty()) {
+            System.out.println("Nenhuma cripto disponível.");
+            return;
+        } else {
+            for (int i = 0; i < criptoAtivos.size(); i++) {
+                CryptoAtivo criptoAtivo = criptoAtivos.get(i);
+                System.out.println((i + 1) + ". " + criptoAtivo.getNome() + " - Valor Atual: " + criptoAtivo.getValorAtual());
+            }
+        }
+
+        System.out.print("\nEscolha o número da cripto que deseja operar: ");
+        int escolha = scanner.nextInt();
+        scanner.nextLine();
+
+        if (escolha < 1 || escolha > criptoAtivos.size()) {
+            System.out.println("Opção inválida. Tente novamente.");
+            return;
+        }
+
+        CryptoAtivo criptoAtivoEscolhido = criptoAtivos.get(escolha - 1);
+
+
+        System.out.println("Ativo escolhido: " + criptoAtivoEscolhido.getNome() + " - Valor Atual: " + criptoAtivoEscolhido.getValorAtual());
+
         int tipoOperacao = 0;
         while (true) {
             System.out.println("Digite 1 para COMPRA ou 2 para VENDA:");
@@ -270,9 +296,6 @@ public class Main {
                 System.out.println("Opção inválida. Tente novamente.");
             }
         }
-
-        System.out.print("Digite o nome do ativo (ex: Bitcoin, Ethereum): ");
-        String ativo = scanner.nextLine();
 
         System.out.print("Digite a quantidade: ");
         double quantidade;
@@ -287,12 +310,6 @@ public class Main {
             return;
         }
 
-        CryptoAtivo criptoAtivo = criptoAtivoDAO.getByNome(ativo);
-        if (criptoAtivo == null) {
-            System.out.println("Erro: Ativo não encontrado.");
-            return;
-        }
-
         double taxa = 0.02;
 
         Carteira carteira = carteiraDAO.getByIdUsuario(usuario.getIdUsuario());
@@ -303,7 +320,7 @@ public class Main {
                 quantidade,
                 new Date(),
                 usuario,
-                criptoAtivo,
+                criptoAtivoEscolhido,
                 taxa,
                 carteira
         );
@@ -311,13 +328,11 @@ public class Main {
         transacaoDAO.insert(transacao);
 
         if (tipoOperacao == 1) {
-
-            double valorCompra = criptoAtivo.getValorAtual() * quantidade * (1 + taxa);
+            double valorCompra = criptoAtivoEscolhido.getValorAtual() * quantidade * (1 + taxa);
             Compra compra = new Compra(transacao.getIdTransacao(), valorCompra);
             compraDAO.insert(compra);
         } else {
-
-            double valorVenda = criptoAtivo.getValorAtual() * quantidade * (1 - taxa);
+            double valorVenda = criptoAtivoEscolhido.getValorAtual() * quantidade * (1 - taxa);
             Venda venda = new Venda(transacao.getIdTransacao(), valorVenda);
             vendaDAO.insert(venda);
         }
@@ -326,6 +341,5 @@ public class Main {
 
         System.out.println("Transação concluída com sucesso!");
     }
-
 
 }

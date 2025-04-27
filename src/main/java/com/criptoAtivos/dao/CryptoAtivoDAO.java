@@ -86,11 +86,32 @@ public class CryptoAtivoDAO {
     }
 
     public CryptoAtivo getByNome(String nome) {
-        if (nome.equalsIgnoreCase("Bitcoin")) {
-            return new CryptoAtivo(
-                    "1", "Bitcoin", 45000.0, 100, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()
-            );
+        CryptoAtivo criptoAtivo = null;
+        String sql = "SELECT * FROM tb_cryptoativo WHERE nome = ?";
+
+        try (Connection connection = ConnectionFactory.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, nome);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                String idCripto = rs.getString("idCripto");
+                double valorAtual = rs.getDouble("valorAtual");
+                double quantidade = rs.getDouble("quantidade");
+
+                List<Transacao> transacoes = getTransacoes(idCripto);
+                List<HistoricoPreco> historicoPrecos = getHistoricoPrecos(idCripto);
+                List<Alerta> alertas = getAlertas(idCripto);
+                List<Educacao> educacao = getEducacao(idCripto);
+
+                criptoAtivo = new CryptoAtivo(
+                        idCripto, nome, valorAtual, quantidade, transacoes, historicoPrecos, alertas, educacao
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        return null;
+
+        return criptoAtivo;
     }
 }

@@ -15,19 +15,45 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
+            System.out.println("\n=== Menu Principal ===");
+            System.out.println("1. Gerenciar Usuários");
+            System.out.println("2. Realizar Transação");
+            System.out.println("3. Sair");
+            System.out.print("Escolha uma opção: ");
+            int opcaoPrincipal = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (opcaoPrincipal) {
+                case 1:
+                    gerenciarUsuarios(usuarioDAO, scanner);
+                    break;
+                case 2:
+                    realizarTransacao(usuarioDAO, criptoAtivoDAO, carteiraDAO, transacaoDAO, compraDAO, vendaDAO, scanner);
+                    break;
+                case 3:
+                    System.out.println("Saindo...");
+                    scanner.close();
+                    return;
+                default:
+                    System.out.println("Opção inválida. Tente novamente.");
+            }
+        }
+    }
+
+    private static void gerenciarUsuarios(UsuarioDAO usuarioDAO, Scanner scanner) {
+        while (true) {
             System.out.println("\n=== Menu Usuário ===");
             System.out.println("1. Cadastrar Usuário");
             System.out.println("2. Listar Usuários");
             System.out.println("3. Buscar Usuário por CPF");
             System.out.println("4. Atualizar Usuário");
             System.out.println("5. Deletar Usuário");
-            System.out.println("6. Realizar Transação (Compra/Venda)");
-            System.out.println("7. Sair");
+            System.out.println("6. Voltar ao Menu Principal");
             System.out.print("Escolha uma opção: ");
-            int opcao = scanner.nextInt();
+            int opcaoUsuario = scanner.nextInt();
             scanner.nextLine();
 
-            switch (opcao) {
+            switch (opcaoUsuario) {
                 case 1:
                     cadastrarUsuario(usuarioDAO, scanner);
                     break;
@@ -44,11 +70,6 @@ public class Main {
                     deletarUsuario(usuarioDAO, scanner);
                     break;
                 case 6:
-                    realizarTransacao(usuarioDAO, criptoAtivoDAO, carteiraDAO, transacaoDAO, compraDAO, vendaDAO, scanner);
-                    break;
-                case 7:
-                    System.out.println("Saindo...");
-                    scanner.close();
                     return;
                 default:
                     System.out.println("Opção inválida. Tente novamente.");

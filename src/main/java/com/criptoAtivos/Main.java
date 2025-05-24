@@ -2,11 +2,6 @@ package com.criptoAtivos;
 
 import com.criptoAtivos.dao.*;
 import com.criptoAtivos.entities.*;
-import com.criptoAtivos.factory.ConnectionFactory;
-
-import java.io.*;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.*;
 
 public class Main {
